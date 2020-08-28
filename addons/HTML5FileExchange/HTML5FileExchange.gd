@@ -37,7 +37,36 @@ func _define_js()->void:
 					fileData = evt.target.result;
 				}
 			}
-		  });
+		});
+	}
+	var fileDataArray = [];
+	var fileTypeArray = [];
+	var fileNameArray = [];
+	var numberOfFiles = 0;
+	function multiupload() {
+		canceled = true;
+		var input = document.createElement('INPUT'); 
+		input.setAttribute("type", "file");
+		input.setAttribute("accept", "image/png, image/jpeg, image/webp");
+		input.setAttribute("multiple","true")
+		input.click();
+		input.addEventListener('change', event => {
+			if (event.target.files.length > 0){
+				canceled = false;}
+			numberOfFiles = event.target.files.length
+			for(var i = 0; i < event.target.files.length; i++){
+				var file = event.target.files[i];
+				var reader = new FileReader();
+				fileTypeArray.push(file.type);
+				fileNameArray.push(file.name);
+				reader.readAsArrayBuffer(file);
+				reader.onloadend = function (evt) {
+					if (evt.target.readyState == FileReader.DONE) {
+						fileDataArray.push(evt.target.result);
+					}
+				}
+			}
+		});
 	}
 	function download(fileName, byte) {
 		var buffer = Uint8Array.from(byte);
@@ -49,7 +78,53 @@ func _define_js()->void:
 	};
 	""", true)
 	
+func load_image_array()->Array:
+	if OS.get_name() != "HTML5" or !OS.has_feature('JavaScript'):
+		return
 	
+	JavaScript.eval("multiupload();", true)
+	
+	yield(self, "InFocus")
+	
+	yield(get_tree().create_timer(0.1), "timeout")
+	
+	if JavaScript.eval("canceled;", true):
+		return
+	
+	var imageDataArray = []
+	var imageTypeArray = []
+	var imageNameArray = []
+	for i in range(JavaScript.eval("numberOfFiles;", true)):
+		while true:
+			imageDataArray.push_back(JavaScript.eval("fileDataArray["+String(i)+"];", true))
+			if imageDataArray.size() == i+1:
+				imageTypeArray.push_back(JavaScript.eval("fileTypeArray["+String(i)+"];", true))
+				imageNameArray.push_back(JavaScript.eval("fileNameArray["+String(i)+"];", true))
+				break
+			
+			yield(get_tree().create_timer(1.0), "timeout")
+	
+	var imageArray = []
+	
+	for i in range(imageDataArray.size()):
+		var image = Image.new()
+		var image_error
+		match imageTypeArray[i]:
+			"image/png":
+				image_error = image.load_png_from_buffer(imageDataArray[i])
+			"image/jpeg":
+				image_error = image.load_jpg_from_buffer(imageDataArray[i])
+			"image/webp":
+				image_error = image.load_webp_from_buffer(imageDataArray[i])
+			var invalidType:
+				return
+		if image_error:
+			return
+		else:
+			imageArray.push_back(image)
+	return imageArray
+
+
 func load_image()->Image:
 	if OS.get_name() != "HTML5" or !OS.has_feature('JavaScript'):
 		return
