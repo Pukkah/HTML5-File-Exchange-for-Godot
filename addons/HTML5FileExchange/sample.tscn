@@ -1,0 +1,35 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://addons/HTML5FileExchange/Sample.gd" type="Script" id=1]
+
+[node name="Control" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+margin_right = 136.0
+margin_bottom = 20.0
+
+[node name="UploadButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+margin_right = 57.0
+margin_bottom = 20.0
+text = "Upload"
+
+[node name="DownloadButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+margin_left = 61.0
+margin_right = 136.0
+margin_bottom = 20.0
+text = "Download"
+
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer"]
+margin_top = 24.0
+margin_right = 136.0
+margin_bottom = 24.0
+script = ExtResource( 1 )
+
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/UploadButton" to="VBoxContainer/TextureRect" method="_on_UploadButton_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/DownloadButton" to="VBoxContainer/TextureRect" method="_on_DownloadButton_pressed"]
