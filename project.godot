@@ -1,0 +1,31 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=4
+
+[application]
+
+config/name="HTML5-File-Exchange-for-Godot"
+run/main_scene="res://addons/HTML5FileExchange/sample.tscn"
+config/icon="res://icon.png"
+
+[autoload]
+
+HTML5File="*res://addons/HTML5FileExchange/HTML5FileExchange.gd"
+
+[editor_plugins]
+
+enabled=PoolStringArray( "res://addons/HTML5FileExchange/plugin.cfg" )
+
+[physics]
+
+common/enable_pause_aware_picking=true
+
+[rendering]
+
+environment/default_environment="res://default_env.tres"
